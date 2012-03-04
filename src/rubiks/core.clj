@@ -129,9 +129,10 @@
          tried-states [initial-state]
          active-threads [(construct-thread initial-state)]]
     (let [all-future-threads (mapcat all-future-threads active-threads)
-          novel-threads (filter (fn [thread]
-                                  (not-in? tried-states (:cube thread)))
-                                all-future-threads)
+          novel-threads all-future-threads
+          ;(filter (fn [thread]
+          ;                        (not-in? tried-states (:cube thread)))
+          ;                      all-future-threads)
           solved-threads (filter (fn [thread]
                                    (= solved-cube (:cube thread)))
                                  novel-threads)]
@@ -232,11 +233,17 @@
          (time (solve (move solved-cube R U R3 U R U2) 6)))
 ; 4,438 ms: no optimizations
 ; 2,871 ms: ratio of 1 (no accidental back-tracking)
+;    72 ms: don't check that states are unique
 
 ; reverse sune (8 deep)
 (= [[:U3 :R :U2 :R3 :U3 :R :U3 :R3]]
          (time (solve (move solved-cube R U R3 U R U2 R3 U) 8)))
 ; 356,186 ms: no optimization
 ; 235,637 ms: ratio of 1 (no accidental back-tracking)
+;     435 ms: don't check that states are unique
+
+; 10 deep
+(= [[:U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
+         (time (solve (move solved-cube R U R3 U R U2 R3 U R3 U3) 10)))
 
 )
