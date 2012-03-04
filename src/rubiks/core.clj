@@ -1,7 +1,7 @@
 (ns rubiks.core
   (:use [clojure.test]))
 
-;;;  cube definitions  ;;;
+;;;  cube definitions and fundamental properties  ;;;
 
 (def w :white)
 (def y :yellow)
@@ -91,7 +91,7 @@
           cube
           moves))
 
-;;;  threads  ;;;
+;;;  threads/solver  ;;;
 
 (defn in? [ls n] (some (partial = n) ls))
 (def not-in? (comp not in?))
@@ -213,7 +213,16 @@
 
 ;;;  *very* long-running tests  ;;;
 
-(deftest
-  solve-sune
-  (is (= [[:U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (solve (move solved-cube R U R3 U R U2 R3 U) 8)))))
+(comment
+
+; 6 deep
+(= [[:U2 :R3 :U3 :R :U3 :R3]]
+         (time (solve (move solved-cube R U R3 U R U2) 6)))
+; no optimizations 4,438 msecs
+
+; reverse sune (8 deep)
+(= [[:U3 :R :U2 :R3 :U3 :R :U3 :R3]]
+         (time (solve (move solved-cube R U R3 U R U2 R3 U) 8)))
+; no optimizations 356,186 msecs
+
+)
