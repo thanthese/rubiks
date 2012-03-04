@@ -157,19 +157,19 @@
 
 (deftest
   R-identities
-  (is (= solved-cube (R (R (R (R solved-cube))))))
-  (is (= solved-cube (R2 (R2 solved-cube))))
-  (is (= solved-cube (R (R3 solved-cube)))))
+  (is (= solved-cube (move solved-cube R R R R)))
+  (is (= solved-cube (move solved-cube R2 R2)))
+  (is (= solved-cube (move solved-cube R R3))))
 
 (deftest
   U-identities
-  (is (= solved-cube (U (U (U (U solved-cube))))))
-  (is (= solved-cube (U2 (U2 solved-cube))))
-  (is (= solved-cube (U (U3 solved-cube)))))
+  (is (= solved-cube (move solved-cube U U U U)))
+  (is (= solved-cube (move solved-cube U2 U2)))
+  (is (= solved-cube (move solved-cube U U3))))
 
 (deftest
   gibberish-move
-  (is (= (R (U3 (R3 (U2 (R (U (R solved-cube)))))))
+  (is (= (move solved-cube R U R U2 R3 U3 R)
          {:top [w w w o w w y y w]
           :front [g g b o o r o o r]
           :bottom [y y w y y w y y y]
