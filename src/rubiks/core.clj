@@ -103,12 +103,24 @@
 (defn all-future-threads
   "Return a set of all possible future threads (one step in advance only)."
   [{:keys [cube move-history] :as thread}]
-  #{{:cube (R cube) , :move-history (conj move-history :R)}
-    {:cube (R2 cube) , :move-history (conj move-history :R2)}
-    {:cube (R3 cube) , :move-history (conj move-history :R3)}
-    {:cube (U cube) , :move-history (conj move-history :U)}
-    {:cube (U2 cube) , :move-history (conj move-history :U2)}
-    {:cube (U3 cube) , :move-history (conj move-history :U3)}})
+  (let [last-move (peek move-history)]
+    (cond (or (= last-move :R) (= last-move :R2) (= last-move :R3))
+          #{{:cube (U cube) , :move-history (conj move-history :U)}
+            {:cube (U2 cube) , :move-history (conj move-history :U2)}
+            {:cube (U3 cube) , :move-history (conj move-history :U3)}}
+          ,,
+          (or (= last-move :U) (= last-move :U2) (= last-move :U3))
+          #{{:cube (R cube) , :move-history (conj move-history :R)}
+            {:cube (R2 cube) , :move-history (conj move-history :R2)}
+            {:cube (R3 cube) , :move-history (conj move-history :R3)}}
+          ,,
+          :else
+          #{{:cube (R cube) , :move-history (conj move-history :R)}
+            {:cube (R2 cube) , :move-history (conj move-history :R2)}
+            {:cube (R3 cube) , :move-history (conj move-history :R3)}
+            {:cube (U cube) , :move-history (conj move-history :U)}
+            {:cube (U2 cube) , :move-history (conj move-history :U2)}
+            {:cube (U3 cube) , :move-history (conj move-history :U3)}})))
 
 (defn fail-msg-max-attempts "Failure: max attempts reached.")
 
@@ -218,11 +230,13 @@
 ; 6 deep
 (= [[:U2 :R3 :U3 :R :U3 :R3]]
          (time (solve (move solved-cube R U R3 U R U2) 6)))
-; no optimizations 4,438 msecs
+; 4,438 ms: no optimizations
+; 2,871 ms: ratio of 1 (no accidental back-tracking)
 
 ; reverse sune (8 deep)
 (= [[:U3 :R :U2 :R3 :U3 :R :U3 :R3]]
          (time (solve (move solved-cube R U R3 U R U2 R3 U) 8)))
-; no optimizations 356,186 msecs
+; 356,186 ms: no optimization
+; 235,637 ms: ratio of 1 (no accidental back-tracking)
 
 )
