@@ -239,13 +239,21 @@
 
 (comment
 
+;; Optimizations
+; 1.  no optimizations
+; 2.  ratio of 1 (no accidental back-tracking)
+; 3.  don't check that states are unique
+; 4.  moved to using records for Cubes and History
+; 5.  jvm-opts ["-Xmx1g" "-server"]
+
 ; 6 deep
 (= [[:U2 :R3 :U3 :R :U3 :R3]]
          (time (solve (move solved-cube R U R3 U R U2) 6)))
-; 1.  4,438 ms:  no optimizations
-; 2.  2,871 ms:  ratio of 1 (no accidental back-tracking)
-; 3.     72 ms:  don't check that states are unique
-; 4.     63 ms:  moved to using records for Cubes and History
+; 1.  4,438 ms
+; 2.  2,871 ms
+; 3.     72 ms
+; 4.     63 ms
+; 5.     25 ms
 
 ; reverse sune (8 deep)
 (= [[:U3 :R :U2 :R3 :U3 :R :U3 :R3]]
@@ -254,11 +262,28 @@
 ; 2.  235,637 ms
 ; 3.      435 ms
 ; 4.      377 ms
+; 5.      230 ms
 
 ; 10 deep
 (= [[:U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
          (time (solve (move solved-cube R U R3 U R U2 R3 U R3 U3) 10)))
-; 3.      out of memory
-; 4.      out of memory
+; 3.  out of memory
+; 4.  out of memory
+; 5.  2,462 ms
+
+; 11 deep
+(= [[:R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
+         (time (solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R) 11)))
+; 5.  6,943 ms
+
+; 12 deep
+(= [[:U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
+         (time (solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U) 12)))
+; 5.  43,420 ms
+
+; 15 deep (oh god!)
+(= [[:R3 :U3 :R3 :U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
+         (time (solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U R U R) 15)))
+; 5.  ms
 
 )
