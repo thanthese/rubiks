@@ -8,6 +8,6 @@ I was originally inspired by [this forum post](http://www.speedsolving.com/forum
 
 ### Twist 3 corners
 
-All twisted corners are on `top`.  Put the untwisted corner at `top` `front` `right`.
+All twisted corners are on `top`.  Put the untwisted corner at `top` `front` `right`.  Will rotate the `top` `back` `right` corner counterclockwise.
 
     R' U R2 U R' U R U2 R U2 R U R' U R2 U
