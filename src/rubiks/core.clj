@@ -102,12 +102,17 @@
 (def U2 (comp U U))
 (def U3 (comp U U U))
 
-(defn move [cube & moves]
+(defn move
+  "Perform a series of turnson the cube."
+  [cube & moves]
   (reduce (fn [c m] (m c))
           cube
           moves))
 
-;;;  solver  ;;;
+;;;  breadth-first solver  ;;;
+
+;; THIS SECTION IS DEPRECATED!
+;; depth-first prevents overflows
 
 (defn in? [ls n] (some (partial = n) ls))
 (def not-in? (comp not in?))
@@ -117,13 +122,13 @@
 (defn all-future-threads
   "Return a set of all possible future threads (one step in advance only)."
   [{:keys [cube move-history] :as thread}]
-  (let [last-move (peek move-history)]
-    (cond (or (= last-move :R) (= last-move :R2) (= last-move :R3))
+  (let [prev-move (peek move-history)]
+    (cond (or (= prev-move :R) (= prev-move :R2) (= prev-move :R3))
           #{(History. (U cube) (conj move-history :U))
             (History. (U2 cube) (conj move-history :U2))
             (History. (U3 cube) (conj move-history :U3))}
           ,,
-          (or (= last-move :U) (= last-move :U2) (= last-move :U3))
+          (or (= prev-move :U) (= prev-move :U2) (= prev-move :U3))
           #{(History. (R cube) (conj move-history :R))
             (History. (R2 cube) (conj move-history :R2))
             (History. (R3 cube) (conj move-history :R3))}
@@ -138,7 +143,7 @@
 
 (defn fail-msg-max-attempts "Failure: max attempts reached.")
 
-(defn solve [initial-state max-depth]
+(defn breadth-first-solve [initial-state max-depth]
   (loop [attempts 1
          tried-states [initial-state]
          active-threads [(History. initial-state [])]]
@@ -146,9 +151,9 @@
           solved-threads (filter (fn [thread]
                                    (= solved-cube (:cube thread)))
                                  all-future-threads)]
-      (println (format "Step %s:  number of threads %s"
-                       attempts
-                       (count all-future-threads)))
+      ;(println (format "Step %s:  number of threads %s"
+      ;                 attempts
+      ;                 (count all-future-threads)))
       (cond (not (empty? solved-threads))
             (map :move-history solved-threads)
             ,,
@@ -160,6 +165,89 @@
               (inc attempts)
               (concat tried-states (map :cube all-future-threads))
               all-future-threads)))))
+
+;;;  depth-first solver  ;;;
+
+(def move-sym-->move {:R R
+              :R2 R2
+              :R3 R3
+              :U U
+              :U2 U2
+              :U3 U3})
+
+(defrecord Node [cube-state history])
+
+(defn bnn [node move-sym]  ; build next node
+  (Node. (move (:cube-state node) (move-sym move-sym-->move))
+         (conj (:history node) move-sym)))
+
+; optimization note: because we're doing 2-gen only, we can add a beneficial
+; constraint: alternate R and U moves.
+(defn depth-first-solve
+  "Solve the given state, looking for solutions up to a particular depth."
+  [initial-cube depth]
+  (loop [queue [(Node. initial-cube [])]]
+    (let [top (peek queue)
+          bot (if (empty? queue) [] (pop queue))]
+      (cond
+        ; nothing left in queue to try
+        (empty? queue)
+        :solution-not-found
+        ,,
+        ; solution found
+        (= solved-cube (:cube-state top))
+        (:history top)
+        ,,
+        ; end of the road for this branch
+        (= depth (count (:history top)))
+        (recur bot)
+        ,,
+        ; add options to queue
+        :else
+        (recur (let [prev-move (peek (:history top))]
+                 (cond
+                   (in? [:R :R2 :R3] prev-move)
+                   (-> bot
+                     (conj (bnn top :U))
+                     (conj (bnn top :U2))
+                     (conj (bnn top :U3)))
+                   ,,
+                   (in? [:U :U2 :U3] prev-move)
+                   (-> bot
+                     (conj (bnn top :R))
+                     (conj (bnn top :R2))
+                     (conj (bnn top :R3)))
+                   ,,
+                   :else
+                   (-> bot
+                     (conj (bnn top :R))
+                     (conj (bnn top :R2))
+                     (conj (bnn top :R3))
+                     (conj (bnn top :U))
+                     (conj (bnn top :U2))
+                     (conj (bnn top :U3))))))))))
+
+(defn solve
+  "A harness for the depth-first solver.  Tries to solve at a depth of 1, 2, 3,
+  4, ... up to max.
+
+  Prints current depth if :print is provided."
+  [initial-cube max-depth & opts]
+  (loop [depth (min 5 max-depth)]  ; 5 isn't so bad anyway
+    (if (in? opts :print) (println "Current depth: " depth))
+    (let [result (depth-first-solve initial-cube depth)]
+      (cond
+        ; solution!
+        (not= result :solution-not-found)
+        result
+        ,,
+        ; too deep
+        (= depth max-depth)
+        :solution-not-found
+        ,,
+        ; keep trying
+        :else
+        (recur (inc depth))))))
 
 ;;;  tests  ;;;
 
@@ -212,28 +300,28 @@
   (is (not (not-in? (range 5) 4))))
 
 (deftest
-  solve-single-move
-  (is (= [[:R3]] (solve (move solved-cube R) 1))))
+  solve-single-move-breadth
+  (is (= [[:R3]] (breadth-first-solve (move solved-cube R) 1))))
 
 (deftest
-  solve-double-move
-  (is (= [[:U3 :R3]] (solve (move solved-cube R U) 2))))
+  solve-double-move-breadth
+  (is (= [[:U3 :R3]] (breadth-first-solve (move solved-cube R U) 2))))
 
 (deftest
   solve-depth-test
-  (is (= fail-msg-max-attempts (solve (move solved-cube R U) 1))))
+  (is (= fail-msg-max-attempts (breadth-first-solve (move solved-cube R U) 1))))
 
 (deftest
   solve-triple-move
-  (is (= [[:R2 :U3 :R3]] (solve (move solved-cube R U R2) 3))))
+  (is (= [[:R2 :U3 :R3]] (breadth-first-solve (move solved-cube R U R2) 3))))
 
 (deftest
   solve-4-deep-move
-  (is (= [[:U2 :R2 :U3 :R3]] (solve (move solved-cube R U R2 U2) 4))))
+  (is (= [[:U2 :R2 :U3 :R3]] (breadth-first-solve (move solved-cube R U R2 U2) 4))))
 
 (deftest
   solve-5-deep-move
-  (is (= [[:R3 :U2 :R2 :U3 :R3]] (solve (move solved-cube R U R2 U2 R) 5))))
+  (is (= [[:R3 :U2 :R2 :U3 :R3]] (breadth-first-solve (move solved-cube R U R2 U2 R) 5))))
 
 ;;;  *very* long-running tests  ;;;
 
@@ -248,7 +336,7 @@
 
 ; 6 deep
 (= [[:U2 :R3 :U3 :R :U3 :R3]]
-         (time (solve (move solved-cube R U R3 U R U2) 6)))
+         (time (breadth-first-solve (move solved-cube R U R3 U R U2) 6)))
 ; 1.  4,438 ms
 ; 2.  2,871 ms
 ; 3.     72 ms
@@ -257,7 +345,7 @@
 
 ; reverse sune (8 deep)
 (= [[:U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (solve (move solved-cube R U R3 U R U2 R3 U) 8)))
+         (time (breadth-first-solve (move solved-cube R U R3 U R U2 R3 U) 8)))
 ; 1.  356,186 ms
 ; 2.  235,637 ms
 ; 3.      435 ms
@@ -266,24 +354,116 @@
 
 ; 10 deep
 (= [[:U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (solve (move solved-cube R U R3 U R U2 R3 U R3 U3) 10)))
+         (time (breadth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3) 10)))
 ; 3.  out of memory
 ; 4.  out of memory
 ; 5.  2,462 ms
 
 ; 11 deep
 (= [[:R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R) 11)))
+         (time (breadth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R) 11)))
 ; 5.  6,943 ms
 
 ; 12 deep
 (= [[:U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U) 12)))
+         (time (breadth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U) 12)))
 ; 5.  43,420 ms
 
 ; 15 deep (oh god!)
 (= [[:R3 :U3 :R3 :U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U R U R) 15)))
+         (time (breadth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U R U R) 15)))
 ; 5.  ms
 
 )
+
+;;;  depth-first testing  ;;;
+
+(deftest
+  depth-fails-nicely
+  (is (= :solution-not-found
+         (depth-first-solve (move solved-cube R U R3 U R U2) 1))))
+
+(deftest
+  solve-single-move-depth
+  (is (= [:R3] (depth-first-solve (move solved-cube R) 1))))
+
+(deftest
+  solve-double-move-depth
+  (is (= [:U3 :R3] (depth-first-solve (move solved-cube R U) 2))))
+
+(deftest
+  solve-5-deep-move-depth
+  (is (= [:R3 :U2 :R2 :U3 :R3] (depth-first-solve (move solved-cube R U R2 U2 R) 5))))
+
+(deftest
+  solve-6-deep-depth
+  (is (= [:U2 :R3 :U3 :R :U3 :R3]
+         (depth-first-solve (move solved-cube R U R3 U R U2) 6))))
+; breadth: 25 ms
+; 1.  600 ms
+; 2.  100 ms: not recomputing cube state all the time
+; 3.   25 ms: alternating Rs and Us
+
+(deftest
+  solve-6-deep-blind
+  (is (= [:U2 :R3 :U3 :R :U3 :R3]
+         (solve (move solved-cube R U R3 U R U2) 10))))
+; breadth: 25 ms
+; 1.  600 ms
+; 2.  100 ms: not recomputing cube state all the time
+; 3.   25 ms: alternating Rs and Us
+
+(comment  ; for those long-running tests
+
+; 10 deep
+(= [:U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]
+   (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3) 10)))
+; breadth:  2,462 ms
+; 3.          647 ms
+
+; 12 deep
+(= [:U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]
+   (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U) 12)))
+; breadth:  43,420 ms
+; 3.           551 ms
+
+; 15 deep (oh god!)
+(= [:U3 :R2 :U3 :R :U :R3 :U3 :R2 :U :R2 :U :R3 :U2 :R3]
+   (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U R U R) 15)))
+; breadth:  overflow error
+; 3.        20,229 ms
+
+)
+
+;;;  actually using the thing to solve my problems  ;;;
+
+(comment
+  ; the solved cube, for reference
+  (Cube. (solid-face :red)     ; back
+         (solid-face :yellow)  ; bottom
+         (solid-face :orange)  ; front
+         (solid-face :blue)    ; left
+         (solid-face :green)   ; right
+         (solid-face :white))  ; top
+)
+
+(solve (Cube. [g g o
+               o w w
+               b w w]
+              [r r g
+               r r o
+               r r o]
+              [b g g
+               y y o
+               y y r]
+              [y g w
+               b b b
+               b b b]
+              [w g w
+               w g b
+               y y y]
+              [g y r
+               o o w
+               o r o])
+       20
+       :print)
