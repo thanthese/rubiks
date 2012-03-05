@@ -447,23 +447,47 @@
          (solid-face :white))  ; top
 )
 
-(solve (Cube. [g g o
-               o w w
-               b w w]
-              [r r g
-               r r o
-               r r o]
-              [b g g
-               y y o
-               y y r]
-              [y g w
+(comment
+
+; something really complicated
+(solve (Cube. [r r w
+               w r r
+               y r r]
+              [y y w
+               y y r
+               y y o]
+              [g o g
+               o o y
+               o o g]
+              [b g w
                b b b
                b b b]
-              [w g w
-               w g b
-               y y y]
-              [g y r
-               o o w
-               o r o])
-       20
+              [y b w
+               g g g
+               o g g]
+              [o w b
+               o w w
+               r w r])
+       21
        :print)
+
+; 3 twisted corners
+(solve (Cube. [g r w
+               r r r
+               r r r]
+              (solid-face y)
+              [o o w
+               o o o
+               o o o]
+              [r b b
+               b b b
+               b b b]
+              [o g w
+               g g g
+               g g g]
+              [b w r
+               w w w
+               w w g]))
+
+  )
+
