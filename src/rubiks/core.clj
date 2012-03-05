@@ -103,7 +103,7 @@
 (def U3 (comp U U U))
 
 (defn move
-  "Perform a series of turnson the cube."
+  "Perform a series of turns on the cube."
   [cube & moves]
   (reduce (fn [c m] (m c))
           cube
