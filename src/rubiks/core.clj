@@ -449,29 +449,8 @@
 
 (comment
 
-; something really complicated
-(solve (Cube. [r r w
-               w r r
-               y r r]
-              [y y w
-               y y r
-               y y o]
-              [g o g
-               o o y
-               o o g]
-              [b g w
-               b b b
-               b b b]
-              [y b w
-               g g g
-               o g g]
-              [o w b
-               o w w
-               r w r])
-       21
-       :print)
-
 ; 3 twisted corners
+; solution (17): [:U3 :R3 :U :R2 :U :R3 :U :R :U2 :R :U2 :R :U :R3 :U :R2 :U2]
 (solve (Cube. [g r w
                r r r
                r r r]
@@ -487,7 +466,8 @@
                g g g]
               [b w r
                w w w
-               w w g]))
+               w w g])
+       21
+       :print)
 
-  )
-
+)
