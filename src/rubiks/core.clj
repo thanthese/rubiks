@@ -42,6 +42,14 @@
          (solid-face :green)   ; right
          (solid-face :white))) ; top
 
+; I have no idea why sometimes cubes need to be compared face-by-face, and why
+; sometimes = is enough.
+(defn solved? [cube]
+  (every? identity
+          (map (fn [side] (= (side cube)
+                             (side solved-cube)))
+               (keys solved-cube))))
+
 (defn R
   "Turn right face clockwise."
   [{:keys [top front left right back bottom] :as cube}]
@@ -149,7 +157,7 @@
          active-threads [(History. initial-state [])]]
     (let [all-future-threads (mapcat all-future-threads active-threads)
           solved-threads (filter (fn [thread]
-                                   (= solved-cube (:cube thread)))
+                                   (solved? (:cube thread)))
                                  all-future-threads)]
       ;(println (format "Step %s:  number of threads %s"
       ;                 attempts
@@ -195,7 +203,7 @@
         :solution-not-found
         ,,
         ; solution found
-        (= solved-cube (:cube-state top))
+        (solved? (:cube-state top))
         (:history top)
         ,,
         ; end of the road for this branch
@@ -269,15 +277,16 @@
 
 (deftest
   R-identities
-  (is (= solved-cube (move solved-cube R R R R)))
-  (is (= solved-cube (move solved-cube R2 R2)))
-  (is (= solved-cube (move solved-cube R R3))))
+  (is (solved? (move solved-cube R R R R)))
+  (is (solved? (move solved-cube R2 R2)))
+  (is (solved? (move solved-cube R R3))))
+
 
 (deftest
   U-identities
-  (is (= solved-cube (move solved-cube U U U U)))
-  (is (= solved-cube (move solved-cube U2 U2)))
-  (is (= solved-cube (move solved-cube U U3))))
+  (is (solved? (move solved-cube U U U U)))
+  (is (solved? (move solved-cube U2 U2)))
+  (is (solved? (move solved-cube U U3))))
 
 (deftest
   gibberish-move
@@ -469,5 +478,28 @@
                w w g])
        21
        :print)
+
+; 4 twisted corners, Pi shape
+; All twisted corners are on `top`.  The `top` color appears twice on the
+; `front` face.  One `top` color appears on the `left` face, and one on the
+; `right`.
+(solve (Cube. [g r b
+               r r r
+               r r r]
+              (solid-face y)
+              [w o w
+               o o o
+               o o o]
+              [w b o
+               b b b
+               b b b]
+              [o g w
+               g g g
+               g g g]
+              [r w r
+               w w w
+               b w g])
+  21
+  :print)
 
 )
