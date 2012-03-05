@@ -53,9 +53,15 @@ namespace.
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#rubiks.core/all-future-threads">all-future-threads</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#rubiks.core/depth-first-solve">depth-first-solve</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#rubiks.core/fail-msg-max-attempts">fail-msg-max-attempts</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#rubiks.core/move">move</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#rubiks.core/solid-face">solid-face</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#rubiks.core/solve">solve</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#rubiks.core/solved-cube">solved-cube</a>
     </div>
@@ -111,6 +117,17 @@ namespace.
 </div><div id="var-entry">
   <br />
   <hr />
+  <h2 id="rubiks.core/depth-first-solve">depth-first-solve</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (depth-first-solve initial-cube depth)
+</pre>
+  <pre id="var-docstr">Solve the given state, looking for solutions up to a particular depth.</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
   <h2 id="rubiks.core/fail-msg-max-attempts">fail-msg-max-attempts</h2>
   <span id="var-type">function</span><br />
   <pre id="var-usage">Usage: (fail-msg-max-attempts)
@@ -122,11 +139,36 @@ namespace.
 </div><div id="var-entry">
   <br />
   <hr />
+  <h2 id="rubiks.core/move">move</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (move cube &amp; moves)
+</pre>
+  <pre id="var-docstr">Perform a series of turns on the cube.</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
   <h2 id="rubiks.core/solid-face">solid-face</h2>
   <span id="var-type">function</span><br />
   <pre id="var-usage">Usage: (solid-face color)
 </pre>
   <pre id="var-docstr">Return a solid face (a vector) of the given color.</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="rubiks.core/solve">solve</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (solve initial-cube max-depth &amp; opts)
+</pre>
+  <pre id="var-docstr">A harness for the depth-first solver.  Tries to solve at a depth of 1, 2, 3,
+4, ... up to max.
+
+Prints current depth if :print is provided.</pre>
   
   
   

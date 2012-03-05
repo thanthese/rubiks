@@ -6,6 +6,8 @@ I was originally inspired by [this forum post](http://www.speedsolving.com/forum
 
 ## Solutions found
 
-- Twist 3 corners
+### Twist 3 corners
 
-    U' R' U R2 U R' U R U2 R U2 R U R' U R2 U2
+All twisted corners are on Top.  Put the untwisted corner at Top Front Right.
+
+    R' U R2 U R' U R U2 R U2 R U R' U R2 U

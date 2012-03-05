@@ -12,7 +12,7 @@
    :wiki-url "/rubiks.core-api.html#rubiks.core/R",
    :doc "Turn right face clockwise.",
    :var-type "function",
-   :line 43,
+   :line 45,
    :file "src/rubiks/core.clj"}
   {:arglists ([{:keys [top front left right back bottom], :as cube}]),
    :name "U",
@@ -22,7 +22,7 @@
    :wiki-url "/rubiks.core-api.html#rubiks.core/U",
    :doc "Turn top face clockwise.",
    :var-type "function",
-   :line 66,
+   :line 75,
    :file "src/rubiks/core.clj"}
   {:arglists ([{:keys [cube move-history], :as thread}]),
    :name "all-future-threads",
@@ -33,7 +33,18 @@
    :doc
    "Return a set of all possible future threads (one step in advance only).",
    :var-type "function",
-   :line 103,
+   :line 122,
+   :file "src/rubiks/core.clj"}
+  {:arglists ([initial-cube depth]),
+   :name "depth-first-solve",
+   :namespace "rubiks.core",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/rubiks.core-api.html#rubiks.core/depth-first-solve",
+   :doc
+   "Solve the given state, looking for solutions up to a particular depth.",
+   :var-type "function",
+   :line 186,
    :file "src/rubiks/core.clj"}
   {:arglists (nil),
    :name "fail-msg-max-attempts",
@@ -43,7 +54,17 @@
    :wiki-url "/rubiks.core-api.html#rubiks.core/fail-msg-max-attempts",
    :doc "Failure: max attempts reached.",
    :var-type "function",
-   :line 113,
+   :line 144,
+   :file "src/rubiks/core.clj"}
+  {:arglists ([cube & moves]),
+   :name "move",
+   :namespace "rubiks.core",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/rubiks.core-api.html#rubiks.core/move",
+   :doc "Perform a series of turns on the cube.",
+   :var-type "function",
+   :line 105,
    :file "src/rubiks/core.clj"}
   {:arglists ([color]),
    :name "solid-face",
@@ -55,12 +76,23 @@
    :var-type "function",
    :line 13,
    :file "src/rubiks/core.clj"}
+  {:arglists ([initial-cube max-depth & opts]),
+   :name "solve",
+   :namespace "rubiks.core",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/rubiks.core-api.html#rubiks.core/solve",
+   :doc
+   "A harness for the depth-first solver.  Tries to solve at a depth of 1, 2, 3,\n4, ... up to max.\n\nPrints current depth if :print is provided.",
+   :var-type "function",
+   :line 230,
+   :file "src/rubiks/core.clj"}
   {:file "src/rubiks/core.clj",
    :raw-source-url nil,
    :source-url nil,
    :wiki-url "/rubiks.core-api.html#rubiks.core/solved-cube",
    :namespace "rubiks.core",
-   :line 18,
+   :line 20,
    :var-type "var",
    :doc
    "\nThe order works thusly.  For the :front face:\n\n1 2 3\n4 5 6\n7 8 9\n\nFor the :right, :left, and :back faces, spin the cube around so that you're\nfacing whichever face, and use the same scheme.  Spin the cube as though it\nwere a globe.\n\nFor the :top face, rotate the cube down (as though you were pouring coffee\ninto your lap), and use the same scheme.\n\nFor the :bottom face, same trick only this time you're pouring the coffee\naway from you.\n",
