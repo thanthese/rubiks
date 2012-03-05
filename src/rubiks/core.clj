@@ -483,6 +483,7 @@
 ; All twisted corners are on `top`.  The `top` color appears twice on the
 ; `front` face.  One `top` color appears on the `left` face, and one on the
 ; `right`.
+; solution: :U :R :U :R2 :U3 :R2 :U3 :R2 :U2 :R2 :U3 :R3 :U :R :U2 :R3
 (solve (Cube. [g r b
                r r r
                r r r]
