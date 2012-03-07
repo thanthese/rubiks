@@ -1,13 +1,15 @@
 An extremely weak Rubik's Cube solver.
 
 I'm primarily interesting in finding better algorithms for completing the cube
-after [F2L](http://www.speedsolving.com/wiki/index.php/First_Two_Layers).  I
-use a modified [Petrus method](http://lar5.com/cube/), so the edges are already
-aligned.  This program was written with the idea of finding 2-gen algorithms
-for completing the cube from this state.
+after [F2L][f2l].  I use a modified [Petrus method][petrus] so the edges are
+already aligned.  This program was written with the idea of finding 2-gen
+algorithms for completing the cube from this state.
 
-I was originally inspired by [this forum
-post](http://www.speedsolving.com/forum/showthread.php?16047-OCELL-CPLL-a-2-gen-friendly-alternative-to-COLL-EPLL).
+I was originally inspired by [this forum post][post]
+
+[ftl]: http//www.speedsolving.com/wiki/index.php/First_Two_Layers
+[petrus]: http//lar5.com/cube/
+[post]: http//www.speedsolving.com/forum/showthread.php?16047-OCELL-CPLL-a-2-gen-friendly-alternative-to-COLL-EPLL
 
 ## Solutions found
 
@@ -18,7 +20,7 @@ All twisted corners are on `top`.  Put the untwisted corner at `top` `front`
 
     R' U R2 U R' U R U2 R U2 R U R' U R2 U
 
-and to rotate the corners counterclockwise:
+and to rotate the corners counterclockwise
 
     U' R2 U' R U' R' U2 R' U2 R' U' R U' R2 U' R
 
@@ -32,3 +34,22 @@ face.  One `top` color appears on the `left` face, and one on the `right`.
 and the inverse
 
     R U2 R' U' R U R2 U2 R2 U R2 U R2 U' R' U'
+
+### Permutate 3 edges
+
+*Incomplete description*
+
+    R2 U R U R' U' R' U' R' U R'
+
+### Permutate 4 edges (diagonals)
+
+*Incomplete description*
+
+    R2 U' R2 U' R' U2 R2 U2 R2 U2 R' U R2 U R2
+
+### Permutate 4 edges (across)
+
+*Incomplete description*
+
+    R2 U2 R' U2 R2 U2 R2 U2 R' U2 R2
+
