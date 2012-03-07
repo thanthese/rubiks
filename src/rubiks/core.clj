@@ -503,4 +503,60 @@
   21
   :print)
 
+; permutate 3 edges
+; solution: :U3 :R2 :U :R :U :R3 :U3 :R3 :U3 :R3 :U :R3 :U
+(solve (Cube. [r o r
+               r r r
+               r r r]
+              (solid-face y)
+              [o b o
+               o o o
+               o o o]
+              [b r b
+               b b b
+               b b b]
+              (solid-face g)
+              (solid-face w))
+       21
+       :print)
+
+; permutate 4 edges (diagonals)
+; solution: :R2 :U3 :R2 :U3 :R3 :U2 :R2 :U2 :R2 :U2 :R3 :U :R2 :U :R2
+(solve (Cube. [r g r
+               r r r
+               r r r]
+              (solid-face y)
+              [o b o
+               o o o
+               o o o]
+              [b o b
+               b b b
+               b b b]
+              [g r g
+               g g g
+               g g g]
+              (solid-face w))
+       21
+       :print)
+
+; permutate 4 edges (across)
+; solution: [:R2 :U2 :R3 :U2 :R2 :U2 :R2 :U2 :R3 :U2 :R2]
+(solve (Cube. [r o r
+               r r r
+               r r r]
+              (solid-face y)
+              [o r o
+               o o o
+               o o o]
+              [b g b
+               b b b
+               b b b]
+              [g b g
+               g g g
+               g g g]
+              (solid-face w))
+       21
+       :print)
+
 )
+
