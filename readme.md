@@ -7,7 +7,7 @@ algorithms for completing the cube from this state.
 
 I was originally inspired by [this forum post][post]
 
-[ftl]: http//www.speedsolving.com/wiki/index.php/First_Two_Layers
+[f2l]: http//www.speedsolving.com/wiki/index.php/First_Two_Layers
 [petrus]: http//lar5.com/cube/
 [post]: http//www.speedsolving.com/forum/showthread.php?16047-OCELL-CPLL-a-2-gen-friendly-alternative-to-COLL-EPLL
 
