@@ -9,7 +9,7 @@ algorithms for completing the cube from this state.
 
 ### Why 2-gen?
 
-2-gen algorithms make that trade-off of longer algorithms for faster execution.
+2-gen algorithms make the trade-off of longer algorithms for faster execution.
 During a 2-gen algorithm, there's no need to rotate the cube or shift your
 grip.  Additionally, they often make [finger tricks][tricks] that much easier.
 
