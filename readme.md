@@ -11,12 +11,13 @@ algorithms for completing the cube from this state.
 
 2-gen algorithms make that trade-off of longer algorithms for faster execution.
 During a 2-gen algorithm, there's no need to rotate the cube or shift your
-grip.
+grip.  Additionally, they often make [finger tricks][tricks] that much easier.
 
 [f2l]: http//www.speedsolving.com/wiki/index.php/First_Two_Layers
 [petrus]: http//lar5.com/cube/
 [post]: http//www.speedsolving.com/forum/showthread.php?16047-OCELL-CPLL-a-2-gen-friendly-alternative-to-COLL-EPLL
 [2gen]: http://www.speedsolving.com/wiki/index.php/2-Gen
+[tricks]: http://www.cubewhiz.com/fingertricks.html
 
 Some of my favorite algorithms, as discovered by this program, are below.
 
