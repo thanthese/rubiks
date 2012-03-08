@@ -7,7 +7,7 @@ algorithms for completing the cube from this state.
 
 I was originally inspired by [this forum post][post].
 
-** Why 2-gen?
+## Why 2-gen?
 
 2-gen algorithms make that trade-off of longer algorithms for faster execution.
 During a 2-gen algorithm, there's no need to rotate the cube or shift your
