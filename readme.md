@@ -37,8 +37,8 @@ and the inverse
 
 ### Permutate 3 edges
 
-Position the good edge at `top` `back`.  The bad edges will all be on `top`.
-The edge in `top` `front` will move to the `left` face.
+The bad edges will all be on `top`.  Position the good edge at `back`.  The
+edge in `top` `front` will move to the `left` face.
 
     R2 U R U R' U' R' U' R' U R'
 
@@ -52,13 +52,9 @@ All incorrect edges are on `top`.  Switches the `front` and `left` edges.
 
     R2 U' R2 U' R' U2 R2 U2 R2 U2 R' U R2 U R2
 
-There is no inverse.
-
 ### Permutate 4 edges (across)
 
 All bad edges are on `top`. Throws edges `front` to `back` and `left` to
 `right`.
 
     R2 U2 R' U2 R2 U2 R2 U2 R' U2 R2
-
-There is no inverse.
