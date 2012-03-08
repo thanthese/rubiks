@@ -5,7 +5,7 @@ after [F2L][f2l].  I use a modified [Petrus method][petrus] so the edges are
 already aligned.  This program was written with the idea of finding [2-gen][2gen]
 algorithms for completing the cube from this state.
 
-I was originally inspired by [this forum post][post].
+[This forum post][post] was my original inspiration.
 
 ### Why 2-gen?
 
