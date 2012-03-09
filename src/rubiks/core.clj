@@ -117,71 +117,17 @@
           cube
           moves))
 
-;;;  breadth-first solver  ;;;
-
-;; THIS SECTION IS DEPRECATED!
-;; depth-first prevents overflows
-
 (defn in? [ls n] (some (partial = n) ls))
 (def not-in? (comp not in?))
-
-(defrecord History [cube move-history])
-
-(defn all-future-threads
-  "Return a set of all possible future threads (one step in advance only)."
-  [{:keys [cube move-history] :as thread}]
-  (let [prev-move (peek move-history)]
-    (cond (or (= prev-move :R) (= prev-move :R2) (= prev-move :R3))
-          #{(History. (U cube) (conj move-history :U))
-            (History. (U2 cube) (conj move-history :U2))
-            (History. (U3 cube) (conj move-history :U3))}
-          ,,
-          (or (= prev-move :U) (= prev-move :U2) (= prev-move :U3))
-          #{(History. (R cube) (conj move-history :R))
-            (History. (R2 cube) (conj move-history :R2))
-            (History. (R3 cube) (conj move-history :R3))}
-          ,,
-          :else
-          #{(History. (R cube) (conj move-history :R))
-            (History. (R2 cube) (conj move-history :R2))
-            (History. (R3 cube) (conj move-history :R3))
-            (History. (U cube) (conj move-history :U))
-            (History. (U2 cube) (conj move-history :U2))
-            (History. (U3 cube) (conj move-history :U3))})))
-
-(defn fail-msg-max-attempts "Failure: max attempts reached.")
-
-(defn breadth-first-solve [initial-state max-depth]
-  (loop [attempts 1
-         tried-states [initial-state]
-         active-threads [(History. initial-state [])]]
-    (let [all-future-threads (mapcat all-future-threads active-threads)
-          solved-threads (filter (fn [thread]
-                                   (solved? (:cube thread)))
-                                 all-future-threads)]
-      ;(println (format "Step %s:  number of threads %s"
-      ;                 attempts
-      ;                 (count all-future-threads)))
-      (cond (not (empty? solved-threads))
-            (map :move-history solved-threads)
-            ,,
-            (>= attempts max-depth)
-            fail-msg-max-attempts
-            ,,
-            :else
-            (recur
-              (inc attempts)
-              (concat tried-states (map :cube all-future-threads))
-              all-future-threads)))))
 
 ;;;  depth-first solver  ;;;
 
 (def move-sym-->move {:R R
-              :R2 R2
-              :R3 R3
-              :U U
-              :U2 U2
-              :U3 U3})
+                      :R2 R2
+                      :R3 R3
+                      :U U
+                      :U2 U2
+                      :U3 U3})
 
 (defrecord Node [cube-state history])
 
@@ -308,83 +254,6 @@
   (is (not-in? (range 5) 10))
   (is (not (not-in? (range 5) 4))))
 
-(deftest
-  solve-single-move-breadth
-  (is (= [[:R3]] (breadth-first-solve (move solved-cube R) 1))))
-
-(deftest
-  solve-double-move-breadth
-  (is (= [[:U3 :R3]] (breadth-first-solve (move solved-cube R U) 2))))
-
-(deftest
-  solve-depth-test
-  (is (= fail-msg-max-attempts (breadth-first-solve (move solved-cube R U) 1))))
-
-(deftest
-  solve-triple-move
-  (is (= [[:R2 :U3 :R3]] (breadth-first-solve (move solved-cube R U R2) 3))))
-
-(deftest
-  solve-4-deep-move
-  (is (= [[:U2 :R2 :U3 :R3]] (breadth-first-solve (move solved-cube R U R2 U2) 4))))
-
-(deftest
-  solve-5-deep-move
-  (is (= [[:R3 :U2 :R2 :U3 :R3]] (breadth-first-solve (move solved-cube R U R2 U2 R) 5))))
-
-;;;  *very* long-running tests  ;;;
-
-(comment
-
-;; Optimizations
-; 1.  no optimizations
-; 2.  ratio of 1 (no accidental back-tracking)
-; 3.  don't check that states are unique
-; 4.  moved to using records for Cubes and History
-; 5.  jvm-opts ["-Xmx1g" "-server"]
-
-; 6 deep
-(= [[:U2 :R3 :U3 :R :U3 :R3]]
-         (time (breadth-first-solve (move solved-cube R U R3 U R U2) 6)))
-; 1.  4,438 ms
-; 2.  2,871 ms
-; 3.     72 ms
-; 4.     63 ms
-; 5.     25 ms
-
-; reverse sune (8 deep)
-(= [[:U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (breadth-first-solve (move solved-cube R U R3 U R U2 R3 U) 8)))
-; 1.  356,186 ms
-; 2.  235,637 ms
-; 3.      435 ms
-; 4.      377 ms
-; 5.      230 ms
-
-; 10 deep
-(= [[:U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (breadth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3) 10)))
-; 3.  out of memory
-; 4.  out of memory
-; 5.  2,462 ms
-
-; 11 deep
-(= [[:R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (breadth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R) 11)))
-; 5.  6,943 ms
-
-; 12 deep
-(= [[:U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (breadth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U) 12)))
-; 5.  43,420 ms
-
-; 15 deep (oh god!)
-(= [[:R3 :U3 :R3 :U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]]
-         (time (breadth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U R U R) 15)))
-; 5.  ms
-
-)
-
 ;;;  depth-first testing  ;;;
 
 (deftest
@@ -408,7 +277,6 @@
   solve-6-deep-depth
   (is (= [:U2 :R3 :U3 :R :U3 :R3]
          (depth-first-solve (move solved-cube R U R3 U R U2) 6))))
-; breadth: 25 ms
 ; 1.  600 ms
 ; 2.  100 ms: not recomputing cube state all the time
 ; 3.   25 ms: alternating Rs and Us
@@ -417,7 +285,6 @@
   solve-6-deep-blind
   (is (= [:U2 :R3 :U3 :R :U3 :R3]
          (solve (move solved-cube R U R3 U R U2) 10))))
-; breadth: 25 ms
 ; 1.  600 ms
 ; 2.  100 ms: not recomputing cube state all the time
 ; 3.   25 ms: alternating Rs and Us
@@ -427,55 +294,38 @@
 ; 10 deep
 (= [:U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]
    (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3) 10)))
-; breadth:  2,462 ms
-; 3.          647 ms
+; 3.  647 ms
 
 ; 12 deep
 (= [:U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]
    (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U) 12)))
-; breadth:  43,420 ms
-; 3.           551 ms
+; 3.  551 ms
+
+; 13 deep
+(= [:R2 :U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]
+   (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U R2) 13)))
+; 3.  25,920 ms
+; 4.  96,581 ms : assoc-in for updates
 
 ; 15 deep (oh god!)
 (= [:U3 :R2 :U3 :R :U :R3 :U3 :R2 :U :R2 :U :R3 :U2 :R3]
    (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U R U R) 15)))
-; breadth:  overflow error
-; 3.        20,229 ms
+; 3.  20,229 ms
 
 )
 
 ;;;  actually using the thing to solve my problems  ;;;
 
 (comment
-  ; the solved cube, for reference
-  (Cube. (solid-face :red)     ; back
-         (solid-face :yellow)  ; bottom
-         (solid-face :orange)  ; front
-         (solid-face :blue)    ; left
-         (solid-face :green)   ; right
-         (solid-face :white))  ; top
-)
-
-(comment
 
 ; 3 twisted corners
 ; solution (17): [:U3 :R3 :U :R2 :U :R3 :U :R :U2 :R :U2 :R :U :R3 :U :R2 :U2]
-(solve (Cube. [g r w
-               r r r
-               r r r]
+(solve (Cube. [g r w r r r r r r]
               (solid-face y)
-              [o o w
-               o o o
-               o o o]
-              [r b b
-               b b b
-               b b b]
-              [o g w
-               g g g
-               g g g]
-              [b w r
-               w w w
-               w w g])
+              [o o w o o o o o o]
+              [r b b b b b b b b]
+              [o g w g g g g g g]
+              [b w r w w w w w g])
        21
        :print)
 
@@ -484,37 +334,21 @@
 ; `front` face.  One `top` color appears on the `left` face, and one on the
 ; `right`.
 ; solution: :U :R :U :R2 :U3 :R2 :U3 :R2 :U2 :R2 :U3 :R3 :U :R :U2 :R3
-(solve (Cube. [g r b
-               r r r
-               r r r]
+(solve (Cube. [g r b r r r r r r]
               (solid-face y)
-              [w o w
-               o o o
-               o o o]
-              [w b o
-               b b b
-               b b b]
-              [o g w
-               g g g
-               g g g]
-              [r w r
-               w w w
-               b w g])
+              [w o w o o o o o o]
+              [w b o b b b b b b]
+              [o g w g g g g g g]
+              [r w r w w w b w g])
   21
   :print)
 
 ; permutate 3 edges
 ; solution: :U3 :R2 :U :R :U :R3 :U3 :R3 :U3 :R3 :U :R3 :U
-(solve (Cube. [r o r
-               r r r
-               r r r]
+(solve (Cube. [r o r r r r r r r]
               (solid-face y)
-              [o b o
-               o o o
-               o o o]
-              [b r b
-               b b b
-               b b b]
+              [o b o o o o o o o]
+              [b r b b b b b b b]
               (solid-face g)
               (solid-face w))
        21
@@ -522,38 +356,22 @@
 
 ; permutate 4 edges (diagonals)
 ; solution: :R2 :U3 :R2 :U3 :R3 :U2 :R2 :U2 :R2 :U2 :R3 :U :R2 :U :R2
-(solve (Cube. [r g r
-               r r r
-               r r r]
+(solve (Cube. [r g r r r r r r r]
               (solid-face y)
-              [o b o
-               o o o
-               o o o]
-              [b o b
-               b b b
-               b b b]
-              [g r g
-               g g g
-               g g g]
+              [o b o o o o o o o]
+              [b o b b b b b b b]
+              [g r g g g g g g g]
               (solid-face w))
        21
        :print)
 
 ; permutate 4 edges (across)
 ; solution: [:R2 :U2 :R3 :U2 :R2 :U2 :R2 :U2 :R3 :U2 :R2]
-(solve (Cube. [r o r
-               r r r
-               r r r]
+(solve (Cube. [r o r r r r r r r]
               (solid-face y)
-              [o r o
-               o o o
-               o o o]
-              [b g b
-               b b b
-               b b b]
-              [g b g
-               g g g
-               g g g]
+              [o r o o o o o o o]
+              [b g b b b b b b b]
+              [g b g g g g g g g]
               (solid-face w))
        21
        :print)
