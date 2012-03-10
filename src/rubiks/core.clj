@@ -113,26 +113,20 @@
 (defn move
   "Perform a series of turns on the cube."
   [cube & moves]
-  (reduce (fn [c m] (m c))
-          cube
-          moves))
+  (reduce #(%2 %1) cube moves))
 
 (defn in? [ls n] (some (partial = n) ls))
 (def not-in? (comp not in?))
 
 ;;;  depth-first solver  ;;;
 
-(def move-sym-->move {:R R
-                      :R2 R2
-                      :R3 R3
-                      :U U
-                      :U2 U2
-                      :U3 U3})
+(def move-sym-->move {:R R, :R2 R2, :R3 R3
+                      :U U, :U2 U2, :U3 U3})
 
 (defrecord Node [cube-state history])
 
-(defn bnn [node move-sym]  ; build next node
-  (Node. (move (:cube-state node) (move-sym move-sym-->move))
+(defn build-next-node [node move-sym]
+  (Node. ((move-sym move-sym-->move) (:cube-state node))
          (conj (:history node) move-sym)))
 
 ; optimization note: because we're doing 2-gen only, we can add a beneficial
@@ -158,28 +152,18 @@
         ,,
         ; add options to queue
         :else
-        (recur (let [prev-move (peek (:history top))]
-                 (cond
-                   (in? [:R :R2 :R3] prev-move)
-                   (-> bot
-                     (conj (bnn top :U))
-                     (conj (bnn top :U2))
-                     (conj (bnn top :U3)))
-                   ,,
-                   (in? [:U :U2 :U3] prev-move)
-                   (-> bot
-                     (conj (bnn top :R))
-                     (conj (bnn top :R2))
-                     (conj (bnn top :R3)))
-                   ,,
-                   :else
-                   (-> bot
-                     (conj (bnn top :R))
-                     (conj (bnn top :R2))
-                     (conj (bnn top :R3))
-                     (conj (bnn top :U))
-                     (conj (bnn top :U2))
-                     (conj (bnn top :U3))))))))))
+        (recur (let [prev-move (peek (:history top))
+                     add-to-queue (fn [queue move-sym]
+                                    (conj queue (build-next-node top move-sym)))]
+                 (reduce add-to-queue bot (cond
+                                            (in? [:R :R2 :R3] prev-move)
+                                            [:U :U2 :U3]
+                                            ,,
+                                            (in? [:U :U2 :U3] prev-move)
+                                            [:R :R2 :R3]
+                                            ,,
+                                            :else
+                                            [:R :R2 :R3 :U :U2 :U3]))))))))
 
 (defn solve
   "A harness for the depth-first solver.  Tries to solve at a depth of 1, 2, 3,
@@ -188,7 +172,7 @@
   Prints current depth if :print is provided."
   [initial-cube max-depth & opts]
   (loop [depth (min 5 max-depth)]  ; 5 isn't so bad anyway
-    (if (in? opts :print) (println "Current depth: " depth))
+    (when (in? opts :print) (println "Current depth: " depth))
     (let [result (depth-first-solve initial-cube depth)]
       (cond
         ; solution!
@@ -306,6 +290,7 @@
    (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U R2) 13)))
 ; 3.  25,920 ms
 ; 4.  96,581 ms : assoc-in for updates
+; 5 . 24,974 ms : refactored
 
 ; 15 deep (oh god!)
 (= [:U3 :R2 :U3 :R :U :R3 :U3 :R2 :U :R2 :U :R3 :U2 :R3]
