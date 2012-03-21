@@ -174,6 +174,72 @@
   "Mirrored sune, in reverse order: U L' U2 L U L' U L."
   (comp m-sune m-sune m-sune))
 
+(defn niklas
+  "Move and twist 3 corners: L U' R' U L' U' R U.
+  The back top right corner doesn't move.  Front-left-top face slides to the
+  right.)"
+  [{:keys [top front left right back bottom] :as cube}]
+  (Cube.
+    ; back
+    [(back 0) (back 1) (right 0)
+     (back 3) (back 4) (back 5)
+     (back 6) (back 7) (back 8)]
+    ; bottom
+    bottom
+    ; front
+    [(top 0) (front 1) (front 0)
+     (front 3) (front 4) (front 5)
+     (front 6) (front 7) (front 8)]
+    ; left
+    [(top 8) (left 1) (left 0)
+     (left 3) (left 4) (left 5)
+     (left 6) (left 7) (left 8)]
+    ; right
+    [(top 6) (right 1) (right 2)
+     (right 3) (right 4) (right 5)
+     (right 6) (right 7) (right 8)]
+    ; top
+    [(front 2) (top 1) (top 2)
+     (top 3) (top 4) (top 5)
+     (back 2) (top 7) (left 2)]))
+
+(def niklas'
+  "U' R' U L U' R U L'"
+  (comp niklas niklas))
+
+(defn m-niklas
+  "Move and twist 3 corners: R' U L U' R U L' U'.
+  The back top left corner doesn't move.  Front-right-top face slides to the
+  left)"
+  [{:keys [top front left right back bottom] :as cube}]
+   (Cube.
+     ; back
+     [(left 2) (back 1) (back 2)
+      (back 3) (back 4) (back 5)
+      (back 6) (back 7) (back 8)]
+     ; bottom
+     bottom
+     ; front
+     [(front 2) (front 1) (top 2)
+      (front 3) (front 4) (front 5)
+      (front 6) (front 7) (front 8)]
+     ; left
+     [(left 0) (left 1) (top 8)
+      (left 3) (left 4) (left 5)
+      (left 6) (left 7) (left 8)]
+     ; right
+     [(right 2) (right 1) (top 6)
+      (right 3) (right 4) (right 5)
+      (right 6) (right 7) (right 8)]
+     ; top
+     [(top 0) (top 1) (front 0)
+      (top 3) (top 4) (top 5)
+      (right 0) (top 7) (back 0)]))
+
+(def m-niklas'
+  "U L U' R' U L' U' R"
+  (comp m-niklas m-niklas))
+
 (defn move
   "Perform a series of turns on the cube."
   [cube & moves]
@@ -193,7 +259,9 @@
 (def move-sym-->move {:R R, :R2 R2, :R' R'
                       :U U, :U2 U2, :U' U'
                       :sune sune, :sune' sune'
-                      :m-sune m-sune, :m-sune' m-sune'})
+                      :m-sune m-sune, :m-sune' m-sune'
+                      :niklas niklas, :niklas' niklas'
+                      :m-niklas m-niklas, :m-niklas' m-niklas'})
 
 (def all-move-syms (keys move-sym-->move))
 
@@ -252,6 +320,18 @@
                              ,,
                              (in? [:m-sune'] prev-move)
                              (diff all-move-syms [:m-sune])
+                             ,,
+                             (in? [:niklas] prev-move)
+                             (diff all-move-syms [:niklas'])
+                             ,,
+                             (in? [:niklas'] prev-move)
+                             (diff all-move-syms [:niklas])
+                             ,,
+                             (in? [:m-niklas] prev-move)
+                             (diff all-move-syms [:m-niklas'])
+                             ,,
+                             (in? [:m-niklas'] prev-move)
+                             (diff all-move-syms [:m-niklas])
                              ,,
                              :else
                              all-move-syms)]
@@ -318,6 +398,16 @@
   m-sune-identities
   (is (solved? (move solved-cube m-sune m-sune m-sune m-sune)))
   (is (solved? (move solved-cube m-sune' m-sune))))
+
+(deftest
+  niklas-identities
+  (is (solved? (move solved-cube niklas niklas niklas)))
+  (is (solved? (move solved-cube niklas' niklas))))
+
+(deftest
+  m-niklas-identities
+  (is (solved? (move solved-cube m-niklas m-niklas m-niklas)))
+  (is (solved? (move solved-cube m-niklas' m-niklas))))
 
 (deftest
   gibberish-move
@@ -469,6 +559,16 @@
               [b g b b b b b b b]
               [g b g g g g g g g]
               (solid-face w))
+       21
+       :print)
+
+; 4 random broken corners; correct edges
+(solve (Cube. [r r g r r r r r r]
+              (solid-face y)
+              [o o w o o o o o o]
+              [r b w b b b b b b]
+              [b g w g g g g g g]
+              [w w b w w w g w o])
        21
        :print)
 
