@@ -263,7 +263,7 @@
 
   Prints current depth if :print is provided."
   [initial-cube max-depth & opts]
-  (loop [depth 0]
+  (loop [depth 1]
     (when (in? opts :print) (println "Current depth: " depth))
     (let [result (depth-first-solve initial-cube depth)]
       (cond
@@ -411,6 +411,7 @@
 
 ; 3 twisted corners
 ; solution (17): [:U' :R' :U :R2 :U :R' :U :R :U2 :R :U2 :R :U :R' :U :R2 :U2]
+; alt solution: [:sune :U2 :m-sune' :sune' :U']
 (solve (Cube. [g r w r r r r r r]
               (solid-face y)
               [o o w o o o o o o]
@@ -425,6 +426,7 @@
 ; `front` face.  One `top` color appears on the `left` face, and one on the
 ; `right`.
 ; solution: :U :R :U :R2 :U' :R2 :U' :R2 :U2 :R2 :U' :R' :U :R :U2 :R'
+; alt solution: [:sune :sune :U2 :sune :sune :U2]
 (solve (Cube. [g r b r r r r r r]
               (solid-face y)
               [w o w o o o o o o]
@@ -436,6 +438,7 @@
 
 ; permutate 3 edges
 ; solution: :U' :R2 :U :R :U :R' :U' :R' :U' :R' :U :R' :U
+; alt solution: [:U' :sune :m-sune :U]
 (solve (Cube. [r o r r r r r r r]
               (solid-face y)
               [o b o o o o o o o]
@@ -447,6 +450,7 @@
 
 ; permutate 4 edges (diagonals)
 ; solution: :R2 :U' :R2 :U' :R' :U2 :R2 :U2 :R2 :U2 :R' :U :R2 :U :R2
+; alt solution: [:sune :U :m-sune' :sune' :U' :m-sune]
 (solve (Cube. [r g r r r r r r r]
               (solid-face y)
               [o b o o o o o o o]
@@ -458,6 +462,7 @@
 
 ; permutate 4 edges (across)
 ; solution: [:R2 :U2 :R' :U2 :R2 :U2 :R2 :U2 :R' :U2 :R2]
+; alt solution: [:sune :U2 :sune :m-sune :U2 :m-sune]
 (solve (Cube. [r o r r r r r r r]
               (solid-face y)
               [o r o o o o o o o]
