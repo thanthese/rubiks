@@ -78,7 +78,7 @@
      (top 6) (top 7) (front 8)]))
 
 (def R2 (comp R R))
-(def R3 (comp R R R))
+(def R' (comp R R R))
 
 (defn U
   "Turn top face clockwise."
@@ -108,14 +108,16 @@
      (top 8) (top 5) (top 2)]))
 
 (def U2 (comp U U))
-(def U3 (comp U U U))
+(def U' (comp U U U))
 
 (defn sune
-  "Perform your basic sune operation: R U R' U R U2 R' U"
+  "Perform your basic sune operation: R U R' U R U2 R' U.  (That's the form
+  where doing 4 in a row takes you back to where you started, also know as the
+  'swap two edges' version.)"
   [{:keys [top front left right back bottom] :as cube}]
   (Cube.
     ; back
-    [(top 8) (back 1) (back 2)
+    [(top 8) (back 1) (back 0)
      (back 3) (back 4) (back 5)
      (back 6) (back 7) (back 8)]
     ; bottom
@@ -135,7 +137,42 @@
     ; top
     [(right 2) (top 1) (front 2)
      (top 7) (top 4) (top 5)
-     (back 2) (top 3) (top 6)])
+     (back 2) (top 3) (top 6)]))
+
+(def sune'
+  "The traditional sune in reverse order: U' R U2 R' U' R U' R'"
+  (comp sune sune sune))
+
+(defn m-sune
+  "The mirrored sune: L' U' L U' L' U2 L U'."
+  [{:keys [top front left right back bottom] :as cube}]
+  (Cube.
+    ; back
+    [(back 2) (back 1) (top 6)
+     (back 3) (back 4) (back 5)
+     (back 6) (back 7) (back 8)]
+    ; bottom
+    bottom
+    ; front
+    [(right 0) (right 1) (top 2)
+     (front 3) (front 4) (front 5)
+     (front 6) (front 7) (front 8)]
+    ; left
+    [(left 2) (left 1) (front 2)
+     (left 3) (left 4) (left 5)
+     (left 6) (left 7) (left 8)]
+    ; right
+    [(right 2) (front 1) (top 0)
+     (right 3) (right 4) (right 5)
+     (right 6) (right 7) (right 8)]
+    ; top
+    [(front 0) (top 1) (left 0)
+     (top 3) (top 4) (top 7)
+     (top 8) (top 5) (back 0)]))
+
+(def m-sune'
+  "Mirrored sune, in reverse order: U L' U2 L U L' U L."
+  (comp m-sune m-sune m-sune))
 
 (defn move
   "Perform a series of turns on the cube."
@@ -145,19 +182,32 @@
 (defn in? [ls n] (some (partial = n) ls))
 (def not-in? (comp not in?))
 
+(defn diff
+  "A logical difference operation.  Remove vec of elements from vec."
+  [ls ls-to-remove]
+  (vec (remove (fn [elem] (in? ls-to-remove elem))
+               ls)))
+
 ;;;  depth-first solver  ;;;
 
-(def move-sym-->move {:R R, :R2 R2, :R3 R3
-                      :U U, :U2 U2, :U3 U3})
+(def move-sym-->move {:R R, :R2 R2, :R' R'
+                      :U U, :U2 U2, :U' U'
+                      :sune sune, :sune' sune'
+                      :m-sune m-sune, :m-sune' m-sune'})
+
+(def all-move-syms (keys move-sym-->move))
 
 (defrecord Node [cube-state history])
 
-(defn build-next-node [node move-sym]
+(defn build-next-node
+  "Use the old new and a move symbol to generate a new node.  Remember that a
+  node is made up of two things:
+  1.  The current cube state (a Cube record, defining all the faces) and
+  2.  A history of the moves (as symbols)"
+  [node move-sym]
   (Node. ((move-sym-->move move-sym) (:cube-state node))
          (conj (:history node) move-sym)))
 
-; optimization note: because we're doing 2-gen only, we can add a beneficial
-; constraint: alternate R and U moves.
 (defn depth-first-solve
   "Solve the given state, looking for solutions up to a particular depth."
   [initial-cube depth]
@@ -181,16 +231,31 @@
         :else
         (recur (let [prev-move (peek (:history top))
                      add-to-queue (fn [queue move-sym]
-                                    (conj queue (build-next-node top move-sym)))]
-                 (reduce add-to-queue bot (cond
-                                            (in? [:R :R2 :R3] prev-move)
-                                            [:U :U2 :U3]
-                                            ,,
-                                            (in? [:U :U2 :U3] prev-move)
-                                            [:R :R2 :R3]
-                                            ,,
-                                            :else
-                                            [:R :R2 :R3 :U :U2 :U3]))))))))
+                                    (conj queue (build-next-node top move-sym)))
+                     ; Restrict future moves based on past moves.  There's no
+                     ; reason to knowingly go in circles.
+                     move-syms (cond
+                             (in? [:R :R2 :R'] prev-move)
+                             (diff all-move-syms [:R :R2 :R'])
+                             ,,
+                             (in? [:U :U2 :U'] prev-move)
+                             (diff all-move-syms [:U :U2 :U'])
+                             ,,
+                             (in? [:sune] prev-move)
+                             (diff all-move-syms [:sune'])
+                             ,,
+                             (in? [:sune'] prev-move)
+                             (diff all-move-syms [:sune])
+                             ,,
+                             (in? [:m-sune] prev-move)
+                             (diff all-move-syms [:m-sune'])
+                             ,,
+                             (in? [:m-sune'] prev-move)
+                             (diff all-move-syms [:m-sune])
+                             ,,
+                             :else
+                             all-move-syms)]
+                 (reduce add-to-queue bot move-syms)))))))
 
 (defn solve
   "A harness for the depth-first solver.  Tries to solve at a depth of 1, 2, 3,
@@ -198,7 +263,7 @@
 
   Prints current depth if :print is provided."
   [initial-cube max-depth & opts]
-  (loop [depth (min 5 max-depth)]  ; 5 isn't so bad anyway
+  (loop [depth 0]
     (when (in? opts :print) (println "Current depth: " depth))
     (let [result (depth-first-solve initial-cube depth)]
       (cond
@@ -229,27 +294,34 @@
 
 (deftest
   move-shortcut
-  (is (= (U2 (R3 (U (R2 (U solved-cube)))))
-         (move solved-cube U R2 U R3 U2))))
+  (is (= (U2 (R' (U (R2 (U solved-cube)))))
+         (move solved-cube U R2 U R' U2))))
 
 (deftest
   R-identities
   (is (solved? (move solved-cube R R R R)))
   (is (solved? (move solved-cube R2 R2)))
-  (is (solved? (move solved-cube R R3))))
+  (is (solved? (move solved-cube R R'))))
 
 (deftest
   U-identities
   (is (solved? (move solved-cube U U U U)))
   (is (solved? (move solved-cube U2 U2)))
-  (is (solved? (move solved-cube U U3))))
+  (is (solved? (move solved-cube U U'))))
 
 (deftest
-  )
+  sune-identities
+  (is (solved? (move solved-cube sune sune sune sune)))
+  (is (solved? (move solved-cube sune' sune))))
+
+(deftest
+  m-sune-identities
+  (is (solved? (move solved-cube m-sune m-sune m-sune m-sune)))
+  (is (solved? (move solved-cube m-sune' m-sune))))
 
 (deftest
   gibberish-move
-  (is (= (move solved-cube R U R U2 R3 U3 R)
+  (is (= (move solved-cube R U R U2 R' U' R)
          (Cube. [g r r w r r g r r]
                 [y y w y y w y y y]
                 [g g b o o r o o r]
@@ -267,37 +339,42 @@
   (is (not-in? (range 5) 10))
   (is (not (not-in? (range 5) 4))))
 
+(deftest
+  test-diff
+  (is (= [1 3 5 6]
+         (diff [1 2 3 4 5 6] [2 4]))))
+
 ;;;  depth-first testing  ;;;
 
 (deftest
   depth-fails-nicely
   (is (= :solution-not-found
-         (depth-first-solve (move solved-cube R U R3 U R U2) 1))))
+         (depth-first-solve (move solved-cube R U R' U R U2) 1))))
 
 (deftest
   solve-single-move-depth
-  (is (= [:R3] (depth-first-solve (move solved-cube R) 1))))
+  (is (= [:R'] (depth-first-solve (move solved-cube R) 1))))
 
 (deftest
   solve-double-move-depth
-  (is (= [:U3 :R3] (depth-first-solve (move solved-cube R U) 2))))
+  (is (= [:U' :R'] (depth-first-solve (move solved-cube R U) 2))))
 
 (deftest
   solve-5-deep-move-depth
-  (is (= [:R3 :U2 :R2 :U3 :R3] (depth-first-solve (move solved-cube R U R2 U2 R) 5))))
+  (is (= [:R' :U2 :R2 :U' :R'] (depth-first-solve (move solved-cube R U R2 U2 R) 5))))
 
 (deftest
   solve-6-deep-depth
-  (is (= [:U2 :R3 :U3 :R :U3 :R3]
-         (depth-first-solve (move solved-cube R U R3 U R U2) 6))))
+  (is (= [:R' :U :sune']
+         (depth-first-solve (move solved-cube R U R' U R U2) 3))))
 ; 1.  600 ms
 ; 2.  100 ms: not recomputing cube state all the time
 ; 3.   25 ms: alternating Rs and Us
 
 (deftest
   solve-6-deep-blind
-  (is (= [:U2 :R3 :U3 :R :U3 :R3]
-         (solve (move solved-cube R U R3 U R U2) 10))))
+  (is (= [:R' :U :sune']
+         (solve (move solved-cube R U R' U R U2) 10))))
 ; 1.  600 ms
 ; 2.  100 ms: not recomputing cube state all the time
 ; 3.   25 ms: alternating Rs and Us
@@ -305,25 +382,25 @@
 (comment  ; for those long-running tests
 
 ; 10 deep
-(= [:U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]
-   (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3) 10)))
+(= [:U :R :U' :R :U2 :R' :U' :R :U' :R']
+   (time (depth-first-solve (move solved-cube R U R' U R U2 R' U R' U') 10)))
 ; 3.  647 ms
 
 ; 12 deep
-(= [:U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]
-   (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U) 12)))
+(= [:U' :R' :U :R :U' :R :U2 :R' :U' :R :U' :R']
+   (time (depth-first-solve (move solved-cube R U R' U R U2 R' U R' U' R U) 12)))
 ; 3.  551 ms
 
 ; 13 deep
-(= [:R2 :U3 :R3 :U :R :U3 :R :U2 :R3 :U3 :R :U3 :R3]
-   (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U R2) 13)))
+(= [:R2 :U' :R' :U :R :U' :R :U2 :R' :U' :R :U' :R']
+   (time (depth-first-solve (move solved-cube R U R' U R U2 R' U R' U' R U R2) 13)))
 ; 3.  25,920 ms
 ; 4.  96,581 ms : assoc-in for updates
 ; 5 . 24,974 ms : refactored
 
 ; 15 deep (oh god!)
-(= [:U3 :R2 :U3 :R :U :R3 :U3 :R2 :U :R2 :U :R3 :U2 :R3]
-   (time (depth-first-solve (move solved-cube R U R3 U R U2 R3 U R3 U3 R U R U R) 15)))
+(= [:U' :R2 :U' :R :U :R' :U' :R2 :U :R2 :U :R' :U2 :R']
+   (time (depth-first-solve (move solved-cube R U R' U R U2 R' U R' U' R U R U R) 15)))
 ; 3.  20,229 ms
 
 )
@@ -333,7 +410,7 @@
 (comment
 
 ; 3 twisted corners
-; solution (17): [:U3 :R3 :U :R2 :U :R3 :U :R :U2 :R :U2 :R :U :R3 :U :R2 :U2]
+; solution (17): [:U' :R' :U :R2 :U :R' :U :R :U2 :R :U2 :R :U :R' :U :R2 :U2]
 (solve (Cube. [g r w r r r r r r]
               (solid-face y)
               [o o w o o o o o o]
@@ -347,7 +424,7 @@
 ; All twisted corners are on `top`.  The `top` color appears twice on the
 ; `front` face.  One `top` color appears on the `left` face, and one on the
 ; `right`.
-; solution: :U :R :U :R2 :U3 :R2 :U3 :R2 :U2 :R2 :U3 :R3 :U :R :U2 :R3
+; solution: :U :R :U :R2 :U' :R2 :U' :R2 :U2 :R2 :U' :R' :U :R :U2 :R'
 (solve (Cube. [g r b r r r r r r]
               (solid-face y)
               [w o w o o o o o o]
@@ -358,7 +435,7 @@
   :print)
 
 ; permutate 3 edges
-; solution: :U3 :R2 :U :R :U :R3 :U3 :R3 :U3 :R3 :U :R3 :U
+; solution: :U' :R2 :U :R :U :R' :U' :R' :U' :R' :U :R' :U
 (solve (Cube. [r o r r r r r r r]
               (solid-face y)
               [o b o o o o o o o]
@@ -369,7 +446,7 @@
        :print)
 
 ; permutate 4 edges (diagonals)
-; solution: :R2 :U3 :R2 :U3 :R3 :U2 :R2 :U2 :R2 :U2 :R3 :U :R2 :U :R2
+; solution: :R2 :U' :R2 :U' :R' :U2 :R2 :U2 :R2 :U2 :R' :U :R2 :U :R2
 (solve (Cube. [r g r r r r r r r]
               (solid-face y)
               [o b o o o o o o o]
@@ -380,7 +457,7 @@
        :print)
 
 ; permutate 4 edges (across)
-; solution: [:R2 :U2 :R3 :U2 :R2 :U2 :R2 :U2 :R3 :U2 :R2]
+; solution: [:R2 :U2 :R' :U2 :R2 :U2 :R2 :U2 :R' :U2 :R2]
 (solve (Cube. [r o r r r r r r r]
               (solid-face y)
               [o r o o o o o o o]
