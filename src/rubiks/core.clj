@@ -110,6 +110,33 @@
 (def U2 (comp U U))
 (def U3 (comp U U U))
 
+(defn sune
+  "Perform your basic sune operation: R U R' U R U2 R' U"
+  [{:keys [top front left right back bottom] :as cube}]
+  (Cube.
+    ; back
+    [(top 8) (back 1) (back 2)
+     (back 3) (back 4) (back 5)
+     (back 6) (back 7) (back 8)]
+    ; bottom
+    bottom
+    ; front
+    [(top 0) (left 1) (left 2)
+     (front 3) (front 4) (front 5)
+     (front 6) (front 7) (front 8)]
+    ; left
+    [(top 2) (front 1) (left 0)
+     (left 3) (left 4) (left 5)
+     (left 6) (left 7) (left 8)]
+    ; right
+    [(front 0) (right 1) (right 0)
+     (right 3) (right 4) (right 5)
+     (right 6) (right 7) (right 8)]
+    ; top
+    [(right 2) (top 1) (front 2)
+     (top 7) (top 4) (top 5)
+     (back 2) (top 3) (top 6)])
+
 (defn move
   "Perform a series of turns on the cube."
   [cube & moves]
@@ -126,7 +153,7 @@
 (defrecord Node [cube-state history])
 
 (defn build-next-node [node move-sym]
-  (Node. ((move-sym move-sym-->move) (:cube-state node))
+  (Node. ((move-sym-->move move-sym) (:cube-state node))
          (conj (:history node) move-sym)))
 
 ; optimization note: because we're doing 2-gen only, we can add a beneficial
@@ -211,12 +238,14 @@
   (is (solved? (move solved-cube R2 R2)))
   (is (solved? (move solved-cube R R3))))
 
-
 (deftest
   U-identities
   (is (solved? (move solved-cube U U U U)))
   (is (solved? (move solved-cube U2 U2)))
   (is (solved? (move solved-cube U U3))))
+
+(deftest
+  )
 
 (deftest
   gibberish-move
