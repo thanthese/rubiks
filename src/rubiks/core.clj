@@ -502,6 +502,7 @@
 ; 3 twisted corners
 ; solution (17): [:U' :R' :U :R2 :U :R' :U :R :U2 :R :U2 :R :U :R' :U :R2 :U2]
 ; alt solution: [:sune :U2 :m-sune' :sune' :U']
+; alt solution: [:niklas' :sune :niklas' :sune]
 (solve (Cube. [g r w r r r r r r]
               (solid-face y)
               [o o w o o o o o o]
