@@ -32,9 +32,6 @@ Some of my favorite algorithms, as discovered by this program, are below.
 - niklas `L U' R' U L' U' R U`
 - niklas' `U' R' U L U' R U L'`
 
-- mirrored niklas `R' U L U' R U L' U'`
-- mirrored niklas' `U L U' R' U L' U' R`
-
 ## Permutated edges
 
 ### Per mutate 3 edges

@@ -207,39 +207,6 @@
   "U' R' U L U' R U L'"
   (comp niklas niklas))
 
-(defn m-niklas
-  "Move and twist 3 corners: R' U L U' R U L' U'.
-  The back top left corner doesn't move.  Front-right-top face slides to the
-  left)"
-  [{:keys [top front left right back bottom] :as cube}]
-   (Cube.
-     ; back
-     [(left 2) (back 1) (back 2)
-      (back 3) (back 4) (back 5)
-      (back 6) (back 7) (back 8)]
-     ; bottom
-     bottom
-     ; front
-     [(front 2) (front 1) (top 2)
-      (front 3) (front 4) (front 5)
-      (front 6) (front 7) (front 8)]
-     ; left
-     [(left 0) (left 1) (top 8)
-      (left 3) (left 4) (left 5)
-      (left 6) (left 7) (left 8)]
-     ; right
-     [(right 2) (right 1) (top 6)
-      (right 3) (right 4) (right 5)
-      (right 6) (right 7) (right 8)]
-     ; top
-     [(top 0) (top 1) (front 0)
-      (top 3) (top 4) (top 5)
-      (right 0) (top 7) (back 0)]))
-
-(def m-niklas'
-  "U L U' R' U L' U' R"
-  (comp m-niklas m-niklas))
-
 (defn move
   "Perform a series of turns on the cube."
   [cube & moves]
@@ -260,8 +227,7 @@
                       :U U, :U2 U2, :U' U'
                       :sune sune, :sune' sune'
                       :m-sune m-sune, :m-sune' m-sune'
-                      :niklas niklas, :niklas' niklas'
-                      :m-niklas m-niklas, :m-niklas' m-niklas'})
+                      :niklas niklas, :niklas' niklas' })
 
 (def all-move-syms (keys move-sym-->move))
 
@@ -326,12 +292,6 @@
                              ,,
                              (in? [:niklas'] prev-move)
                              (diff all-move-syms [:niklas])
-                             ,,
-                             (in? [:m-niklas] prev-move)
-                             (diff all-move-syms [:m-niklas'])
-                             ,,
-                             (in? [:m-niklas'] prev-move)
-                             (diff all-move-syms [:m-niklas])
                              ,,
                              :else
                              all-move-syms)]
@@ -403,11 +363,6 @@
   niklas-identities
   (is (solved? (move solved-cube niklas niklas niklas)))
   (is (solved? (move solved-cube niklas' niklas))))
-
-(deftest
-  m-niklas-identities
-  (is (solved? (move solved-cube m-niklas m-niklas m-niklas)))
-  (is (solved? (move solved-cube m-niklas' m-niklas))))
 
 (deftest
   gibberish-move
@@ -563,13 +518,13 @@
        21
        :print)
 
-; 4 random broken corners; correct edges
-(solve (Cube. [r r g r r r r r r]
+; random sit
+(solve (Cube. [w r b r r r r r r]
               (solid-face y)
-              [o o w o o o o o o]
-              [r b w b b b b b b]
-              [b g w g g g g g g]
-              [w w b w w w g w o])
+              [b g w o o o o o o]
+              [o b r b b b b b b]
+              [o o r g g g g g g]
+              [w w g w w w w w g])
        21
        :print)
 
