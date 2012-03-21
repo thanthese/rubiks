@@ -518,13 +518,13 @@
        21
        :print)
 
-; random sit
-(solve (Cube. [w r b r r r r r r]
+; random last-layer-yet-to-solve
+(solve (Cube. [g r w r r r r r r]
               (solid-face y)
-              [b g w o o o o o o]
-              [o b r b b b b b b]
-              [o o r g g g g g g]
-              [w w g w w w w w g])
+              [r o w o o o o o o]
+              [b b w b b b b b b]
+              [g g o g g g g g g]
+              [o w w w w w b w r])
        21
        :print)
 

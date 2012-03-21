@@ -21,7 +21,7 @@ grip.  Additionally, they often make [finger tricks][tricks] that much easier.
 
 Some of my favorite algorithms, as discovered by this program, are below.
 
-## Terminology
+## Common combinations
 
 - sune `R U R' U R U2 R' U`
 - sune' `U' R U2 R' U' R U' R'`
