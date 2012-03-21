@@ -23,17 +23,17 @@ Some of my favorite algorithms, as discovered by this program, are below.
 
 ## Terminology
 
-sune `R U R' U R U2 R' U`
-sune' `U' R U2 R' U' R U' R'`
+- sune `R U R' U R U2 R' U`
+- sune' `U' R U2 R' U' R U' R'`
 
-mirrored sune `L' U' L U' L' U2 L U'`
-mirrored sune' `U L' U2 L U L' U L`
+- mirrored sune `L' U' L U' L' U2 L U'`
+- mirrored sune' `U L' U2 L U L' U L`
 
-niklas `L U' R' U L' U' R U`
-niklas' `U' R' U L U' R U L'`
+- niklas `L U' R' U L' U' R U`
+- niklas' `U' R' U L U' R U L'`
 
-mirrored niklas `R' U L U' R U L' U'`
-mirrored niklas' `U L U' R' U L' U' R`
+- mirrored niklas `R' U L U' R U L' U'`
+- mirrored niklas' `U L U' R' U L' U' R`
 
 ## Permutated edges
 
