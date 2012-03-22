@@ -34,7 +34,7 @@ Some of my favorite algorithms, as discovered by this program, are below.
 
 ## Permutated edges
 
-### Per mutate 3 edges
+### Permutate 3 edges
 
 The bad edges are on `top`.  Position the good edge at `back`.  The edge in
 `front` will move to the `left` face.
