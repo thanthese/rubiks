@@ -28,6 +28,8 @@ Since this project is only interested in solving the last layer, we can adopt a
 simplified notation.  The following diagram depicts a solved last layer, as
 seen from above.
 
+tes
+
       -   -   -
     < 0   0   0 >
 
