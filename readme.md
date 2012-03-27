@@ -2,10 +2,10 @@ An extremely weak Rubik's Cube solver.
 
 I'm primarily interesting in finding better algorithms for completing the cube
 after [F2L][f2l].  I use a modified [Petrus method][petrus] so the edges are
-already aligned.  This program was written with the idea of finding [2-gen][2gen]
-algorithms for completing the cube from this state.
+already aligned.  This program was written with the idea of finding
+[2-gen][2gen] algorithms for completing the cube from this state.
 
-[This forum post][post] was my original inspiration.
+[This forum post][forum] was my original inspiration.
 
 ### Why 2-gen?
 
@@ -15,15 +15,52 @@ grip.  Additionally, they often make [finger tricks][tricks] that much easier.
 
 [f2l]: http//www.speedsolving.com/wiki/index.php/First_Two_Layers
 [petrus]: http//lar5.com/cube/
-[post]: http//www.speedsolving.com/forum/showthread.php?16047-OCELL-CPLL-a-2-gen-friendly-alternative-to-COLL-EPLL
+[forum]: http//www.speedsolving.com/forum/showthread.php?16047-OCELL-CPLL-a-2-gen-friendly-alternative-to-COLL-EPLL
 [2gen]: http://www.speedsolving.com/wiki/index.php/2-Gen
 [tricks]: http://www.cubewhiz.com/fingertricks.html
 
-Some of my favorite algorithms, as discovered by this program, are below.
+Some of my favorite algorithms, as discovered by this program, are listed in
+this file.
+
+## Notation
+
+Since this project is only interested in solving the last layer, we can adopt a
+simplified notation.  The following diagram depicts a solved last layer, as
+seen from above.
+
+      - - -
+    < 0 0 0 >
+    < 0 0 0 >
+    < 0 0 0 >
+      + + +
+
+Thus,
+
+    -  =  back
+    +  =  front
+    <  =  left
+    >  =  right
+    0  =  top
+    .  =  sticker is in position (simplifying convention)
+
+For the purpose of identifying patterns, the `0`s and `.`s are usually most
+helpful.
 
 ## Common combinations
 
-- sune `R U R' U R U2 R' U`
+These combinations are so common, they're often referred to by name.  Many of
+the names come from Petrus.
+
+### Sune
+
+    R U R' U R U2 R' U2
+
+      0 > >
+    - < . - 0
+    . . . . +
+    . . . > +
+      . - 0
+
 - sune' `U' R U2 R' U' R U' R'`
 
 - mirrored sune `L' U' L U' L' U2 L U'`
