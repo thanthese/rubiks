@@ -28,22 +28,20 @@ Since this project is only interested in solving the last layer, we can adopt a
 simplified notation.  The following diagram depicts a solved last layer, as
 seen from above.
 
-      -   -   -
-    < 0   0   0 >
-
-    < 0   0   0 >
-
-    < 0   0   0 >
-      +   +   +
+      - - -
+    < 0 0 0 >
+    < 0 0 0 >
+    < 0 0 0 >
+      + + +
 
 Thus,
 
-    -      = back
-    +      = front
-    <      = left
-    >      = right
-    0      = top
-    ., " " = sticker is in position (simplifying convention)
+    -  =  back
+    +  =  front
+    <  =  left
+    >  =  right
+    0  =  top
+    .  =  sticker is in position (simplifying convention)
 
 For the purpose of identifying patterns, the `0`s and `.`s are usually most
 helpful.
@@ -62,13 +60,11 @@ Used for spinning three corners.
 
     R U R' U R U2 R' U2
 
-      0   >   >
-    - <   .   - 0
-
-    . .       . +
-
-    . .   .   > +
-      .   -   0
+      0 > >
+    - < . - 0
+    . . . . +
+    . . . > +
+      . - 0
 
 ### Sune'
 
@@ -76,37 +72,31 @@ Same effect as two Sunes.  Spins the corners the other way.
 
     U2 R U2 R' U' R U' R'
 
-      <   +   0
-    0 -   .   > -
-
-    . .       . -
-
-    . .   .   + 0
-      .   >   >
+      < + 0
+    0 - . > -
+    . . . . -
+    . . . + 0
+      . > >
 
 ### Mirrored Sune
 
     L' U' L U' L' U2 L U2
 
-      <   <   0
-    0 -   .   > -
-
-    + .       . .
-
-    + <   .   . .
-      0   -   .
+      < < 0
+    0 - . > -
+    + . . . .
+    + < . . .
+      0 - .
 
 ### Mirrored Sune'
 
     U2 L' U2 L U L' U L
 
-      0   +   >
-    - <   .   - 0
-
-    - .       . .
-
-    0 +   .   . .
-      <   <   .
+      0 + >
+    - < . - 0
+    - . . . .
+    0 + . . .
+      < < .
 
 ### Niklas
 
@@ -114,25 +104,21 @@ Used for swapping two adjacent corners.
 
     L U' R' U L' U' R U2
 
-      0   >   >
-    - <   .   . +
-
-    - .       . +
-
-    0 +   .   - .
-      <   <   0
+      0 > >
+    - < . . +
+    - . . . +
+    0 + . - .
+      < < 0
 
 ### Niklas'
 
     U2 R' U L U' R U L'
 
-      <   <   0
-    0 -   .   + .
-
-    + .       . -
-
-    + <   .   . -
-      0   >   >
+      < < 0
+    0 - . + .
+    + . . . -
+    + < . . -
+      0 > >
 
 ## Permutated edges
 
