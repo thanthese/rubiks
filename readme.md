@@ -100,7 +100,7 @@ Same effect as two Sunes.  Spins the corners the other way.
 
 ### Niklas
 
-    Used for swapping the location of two adjacent corners.
+Used for swapping the location of two adjacent corners.
 
     L U' R' U L' U' R U2
 
