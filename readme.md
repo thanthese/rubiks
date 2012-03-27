@@ -53,6 +53,8 @@ the names come from Petrus.
 
 ### Sune
 
+Used for *orienting* corners.
+
     R U R' U R U2 R' U2
 
       0 > >
