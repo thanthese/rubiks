@@ -46,6 +46,9 @@ Thus,
 For the purpose of identifying patterns, the `0`s and `.`s are usually most
 helpful.
 
+Finally, instead of the more conventional "orienting" and "permutating" terms,
+I prefer the more casual "spinning" and "moving".
+
 ## Common combinations
 
 These combinations are so common, they're often referred to by name.  Many of
@@ -53,7 +56,7 @@ the names come from Petrus.
 
 ### Sune
 
-Used for *orienting* corners.
+Used for **spinning** three corners.
 
     R U R' U R U2 R' U2
 
@@ -63,7 +66,17 @@ Used for *orienting* corners.
     . . . > +
       . - 0
 
-- sune' `U' R U2 R' U' R U' R'`
+## Sune'
+
+Same effect as two Sunes.  Spins the corners the other way.
+
+    U2 R U2 R' U' R U' R'
+
+      < + 0
+    0 - . > -
+    . . . . -
+    . . . + 0
+      . > >
 
 - mirrored sune `L' U' L U' L' U2 L U'`
 - mirrored sune' `U L' U2 L U L' U L`
