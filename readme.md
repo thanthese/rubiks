@@ -56,7 +56,7 @@ the names come from Petrus.
 
 ### Sune
 
-Used for **spinning** three corners.
+Used for spinning three corners.
 
     R U R' U R U2 R' U2
 
@@ -98,8 +98,27 @@ Same effect as two Sunes.  Spins the corners the other way.
     0 + . . .
       < < .
 
-- niklas `L U' R' U L' U' R U`
-- niklas' `U' R' U L U' R U L'`
+### Niklas
+
+    Used for swapping the location of two adjacent corners.
+
+    L U' R' U L' U' R U2
+
+      0 > >
+    - < . . +
+    - . . . +
+    0 + . - .
+      < < 0
+
+### Niklas'
+
+    U2 R' U L U' R U L'
+
+      < < 0
+    0 - . + .
+    + . . . -
+    + < . . -
+      0 > >
 
 ## Permutated edges
 
