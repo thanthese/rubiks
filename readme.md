@@ -66,7 +66,7 @@ Used for **spinning** three corners.
     . . . > +
       . - 0
 
-## Sune'
+### Sune'
 
 Same effect as two Sunes.  Spins the corners the other way.
 
@@ -78,8 +78,25 @@ Same effect as two Sunes.  Spins the corners the other way.
     . . . + 0
       . > >
 
-- mirrored sune `L' U' L U' L' U2 L U'`
-- mirrored sune' `U L' U2 L U L' U L`
+### Mirrored Sune
+
+    L' U' L U' L' U2 L U2
+
+      < < 0
+    0 - . > -
+    + . . . .
+    + < . . .
+      0 - .
+
+### Mirrored Sune'
+
+    U2 L' U2 L U L' U L
+
+      0 + >
+    - < . - 0
+    - . . . .
+    0 + . . .
+      < < .
 
 - niklas `L U' R' U L' U' R U`
 - niklas' `U' R' U L U' R U L'`
