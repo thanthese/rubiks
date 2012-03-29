@@ -80,6 +80,36 @@
 (def R2 (comp R R))
 (def R' (comp R R R))
 
+(defn L
+  "Turn left face clockwise."
+  [{:keys [top front left right back bottom] :as cube}]
+  (Cube.
+    ; back
+    [(back 0) (back 1) (bottom 6)
+     (back 3) (back 4) (bottom 3)
+     (back 6) (back 7) (bottom 0)]
+    ; bottom
+    [(front 0) (bottom 1) (bottom 2)
+     (front 3) (bottom 4) (bottom 5)
+     (front 6) (bottom 7) (bottom 8)]
+    ; front
+    [(top 0) (front 1) (front 2)
+     (top 3) (front 4) (front 5)
+     (top 6) (front 7) (front 8)]
+    ; left
+    [(left 6) (left 3) (left 0)
+     (left 7) (left 4) (left 1)
+     (left 8) (left 5) (left 2)]
+    ; right
+    right
+    ; top
+    [(back 8) (top 1) (top 2)
+     (back 5) (top 4) (top 5)
+     (back 2) (top 7) (top 8)]))
+
+(def L2 (comp L L))
+(def L' (comp L L L))
+
 (defn U
   "Turn top face clockwise."
   [{:keys [top front left right back bottom] :as cube}]
@@ -110,102 +140,13 @@
 (def U2 (comp U U))
 (def U' (comp U U U))
 
-(defn sune
-  "Perform your basic sune operation: R U R' U R U2 R' U.  (That's the form
-  where doing 4 in a row takes you back to where you started, also know as the
-  'swap two edges' version.)"
-  [{:keys [top front left right back bottom] :as cube}]
-  (Cube.
-    ; back
-    [(top 8) (back 1) (back 0)
-     (back 3) (back 4) (back 5)
-     (back 6) (back 7) (back 8)]
-    ; bottom
-    bottom
-    ; front
-    [(top 0) (left 1) (left 2)
-     (front 3) (front 4) (front 5)
-     (front 6) (front 7) (front 8)]
-    ; left
-    [(top 2) (front 1) (left 0)
-     (left 3) (left 4) (left 5)
-     (left 6) (left 7) (left 8)]
-    ; right
-    [(front 0) (right 1) (right 0)
-     (right 3) (right 4) (right 5)
-     (right 6) (right 7) (right 8)]
-    ; top
-    [(right 2) (top 1) (front 2)
-     (top 7) (top 4) (top 5)
-     (back 2) (top 3) (top 6)]))
+(def sune (comp R U R' U R U2 R' U2))
+(def sune' (comp U2 R U2 R' U' R U' R'))
+(def m-sune (comp L' U' L U' L' U2 L U2))
+(def m-sune' (comp U2 L' U2 L U L' U L))
 
-(def sune'
-  "The traditional sune in reverse order: U' R U2 R' U' R U' R'"
-  (comp sune sune sune))
-
-(defn m-sune
-  "The mirrored sune: L' U' L U' L' U2 L U'."
-  [{:keys [top front left right back bottom] :as cube}]
-  (Cube.
-    ; back
-    [(back 2) (back 1) (top 6)
-     (back 3) (back 4) (back 5)
-     (back 6) (back 7) (back 8)]
-    ; bottom
-    bottom
-    ; front
-    [(right 0) (right 1) (top 2)
-     (front 3) (front 4) (front 5)
-     (front 6) (front 7) (front 8)]
-    ; left
-    [(left 2) (left 1) (front 2)
-     (left 3) (left 4) (left 5)
-     (left 6) (left 7) (left 8)]
-    ; right
-    [(right 2) (front 1) (top 0)
-     (right 3) (right 4) (right 5)
-     (right 6) (right 7) (right 8)]
-    ; top
-    [(front 0) (top 1) (left 0)
-     (top 3) (top 4) (top 7)
-     (top 8) (top 5) (back 0)]))
-
-(def m-sune'
-  "Mirrored sune, in reverse order: U L' U2 L U L' U L."
-  (comp m-sune m-sune m-sune))
-
-(defn niklas
-  "Move and twist 3 corners: L U' R' U L' U' R U.
-  The back top right corner doesn't move.  Front-left-top face slides to the
-  right.)"
-  [{:keys [top front left right back bottom] :as cube}]
-  (Cube.
-    ; back
-    [(back 0) (back 1) (right 0)
-     (back 3) (back 4) (back 5)
-     (back 6) (back 7) (back 8)]
-    ; bottom
-    bottom
-    ; front
-    [(top 0) (front 1) (front 0)
-     (front 3) (front 4) (front 5)
-     (front 6) (front 7) (front 8)]
-    ; left
-    [(top 8) (left 1) (left 0)
-     (left 3) (left 4) (left 5)
-     (left 6) (left 7) (left 8)]
-    ; right
-    [(top 6) (right 1) (right 2)
-     (right 3) (right 4) (right 5)
-     (right 6) (right 7) (right 8)]
-    ; top
-    [(front 2) (top 1) (top 2)
-     (top 3) (top 4) (top 5)
-     (back 2) (top 7) (left 2)]))
-
-(def niklas'
-  "U' R' U L U' R U L'"
-  (comp niklas niklas))
+(def niklas (comp L U' R' U L' U' R U2))
+(def niklas' (comp U2 R' U L U' R U L'))
 
 (defn move
   "Perform a series of turns on the cube."
@@ -333,6 +274,10 @@
   (is (= expected-counts (count-colors (U solved-cube)))))
 
 (deftest
+  L-produces-right-num-of-colors
+  (is (= expected-counts (count-colors (L solved-cube)))))
+
+(deftest
   move-shortcut
   (is (= (U2 (R' (U (R2 (U solved-cube)))))
          (move solved-cube U R2 U R' U2))))
@@ -350,18 +295,26 @@
   (is (solved? (move solved-cube U U'))))
 
 (deftest
+  L-identities
+  (is (solved? (move solved-cube L L L L)))
+  (is (solved? (move solved-cube L2 L2)))
+  (is (solved? (move solved-cube L L'))))
+
+(deftest
   sune-identities
-  (is (solved? (move solved-cube sune sune sune sune)))
+  (is (solved? (move solved-cube sune sune sune)))
   (is (solved? (move solved-cube sune' sune))))
 
 (deftest
   m-sune-identities
-  (is (solved? (move solved-cube m-sune m-sune m-sune m-sune)))
+  (is (solved? (move solved-cube m-sune m-sune m-sune)))
   (is (solved? (move solved-cube m-sune' m-sune))))
 
 (deftest
   niklas-identities
-  (is (solved? (move solved-cube niklas niklas niklas)))
+  (is (solved? (move solved-cube niklas niklas niklas niklas niklas
+                                 niklas niklas niklas niklas niklas
+                                 niklas niklas)))
   (is (solved? (move solved-cube niklas' niklas))))
 
 (deftest
@@ -410,7 +363,7 @@
 
 (deftest
   solve-6-deep-depth
-  (is (= [:R' :U :sune']
+  (is (= [:R' :m-sune :U2]
          (depth-first-solve (move solved-cube R U R' U R U2) 3))))
 ; 1.  600 ms
 ; 2.  100 ms: not recomputing cube state all the time
@@ -418,7 +371,7 @@
 
 (deftest
   solve-6-deep-blind
-  (is (= [:R' :U :sune']
+  (is (= [:R' :m-sune :U2]
          (solve (move solved-cube R U R' U R U2) 10))))
 ; 1.  600 ms
 ; 2.  100 ms: not recomputing cube state all the time
